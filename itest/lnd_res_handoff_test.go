@@ -60,10 +60,7 @@ func testResHandoff(ht *lntest.HarnessTest) {
 
 	// Bob will now force close his channel with Carol such that resolution
 	// messages are created and forwarded backwards to Alice.
-	ht.CloseChannelAssertPending(bob, chanPointCarol, true)
-
-	// The channel should be listed in the PendingChannels result.
-	ht.AssertNumWaitingClose(bob, 1)
+	ht.ForceCloseChannel(bob, chanPointCarol)
 
 	// Mine a block to confirm the closing tx.
 	ht.MineBlocks(1)
@@ -73,11 +70,6 @@ func testResHandoff(ht *lntest.HarnessTest) {
 	// if there was some feedback (i.e. API in switch) that allowed for
 	// querying the state of resolution messages.
 	time.Sleep(10 * time.Second)
-
-	// Mine blocks until Bob has no waiting close channels. This tests that
-	// the circuit-deletion logic is skipped if a resolution message
-	// exists.
-	ht.CleanupForceClose(bob)
 
 	// We will now restart Bob so that we can test whether the resolution
 	// messages are re-forwarded on start-up.

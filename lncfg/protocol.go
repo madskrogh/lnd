@@ -1,5 +1,3 @@
-//go:build !integration
-
 package lncfg
 
 // ProtocolOptions is a struct that we use to be able to test backwards

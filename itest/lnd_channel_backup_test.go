@@ -1137,6 +1137,8 @@ func testDataLossProtection(ht *lntest.HarnessTest) {
 	// Before we make a channel, we'll load up Carol with some coins sent
 	// directly from the miner.
 	ht.FundCoins(btcutil.SatoshiPerBitcoin, carol)
+	// We will also give Dave some funds to sweep his anchor output.
+	ht.FundCoins(btcutil.SatoshiPerBitcoin, dave)
 
 	// timeTravelDave is a method that will make Carol open a channel to
 	// Dave, settle a series of payments, then Dave back to the state
@@ -1235,7 +1237,7 @@ func testDataLossProtection(ht *lntest.HarnessTest) {
 	// on chain, and both of them properly carry out the DLP protocol.
 	assertDLPExecuted(
 		ht, carol, carolStartingBalance, dave,
-		daveStartingBalance, lnrpc.CommitmentType_STATIC_REMOTE_KEY,
+		daveStartingBalance, lnrpc.CommitmentType_ANCHORS,
 	)
 
 	// As a second part of this test, we will test the scenario where a
@@ -1266,12 +1268,12 @@ func testDataLossProtection(ht *lntest.HarnessTest) {
 	// information Dave needs to sweep his funds.
 	require.NoError(ht, restartDave(), "unable to restart Eve")
 
-	// Dave should sweep his funds.
-	ht.Miner.AssertNumTxsInMempool(1)
+	// Dave should sweep his funds and anchor output.
+	ht.Miner.AssertNumTxsInMempool(2)
 
 	// Mine a block to confirm the sweep, and make sure Dave got his
 	// balance back.
-	ht.MineBlocksAndAssertNumTxes(1, 1)
+	ht.MineBlocksAndAssertNumTxes(1, 2)
 	ht.AssertNodeNumChannels(dave, 0)
 
 	err := wait.NoError(func() error {

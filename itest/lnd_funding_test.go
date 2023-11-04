@@ -484,7 +484,7 @@ func runChannelFundingInputTypes(ht *lntest.HarnessTest, alice,
 		//
 		// Note that atm we haven't obtained the chanPoint yet, so we
 		// use the type directly.
-		cType := lnrpc.CommitmentType_STATIC_REMOTE_KEY
+		cType := lnrpc.CommitmentType_ANCHORS
 		carolLocalBalance := chanAmt - lntest.CalcStaticFee(cType, 0)
 		checkChannelBalance(carol, 0, 0, carolLocalBalance, 0)
 
@@ -940,7 +940,6 @@ func testBatchChanFunding(ht *lntest.HarnessTest) {
 	scidAliasArgs := []string{
 		"--protocol.option-scid-alias",
 		"--protocol.zero-conf",
-		"--protocol.anchors",
 	}
 	eve := ht.NewNode("eve", scidAliasArgs)
 

@@ -133,12 +133,13 @@ func CommitTypeHasTaproot(commitType lnrpc.CommitmentType) bool {
 	}
 }
 
-// CommitTypeHasAnchors returns whether commitType uses anchor outputs.
+// CommitTypeHasNoAnchors returns whether commitType uses anchor outputs.
 func CommitTypeHasAnchors(commitType lnrpc.CommitmentType) bool {
 	switch commitType {
 	case lnrpc.CommitmentType_ANCHORS,
 		lnrpc.CommitmentType_SIMPLE_TAPROOT,
-		lnrpc.CommitmentType_SCRIPT_ENFORCED_LEASE:
+		lnrpc.CommitmentType_SCRIPT_ENFORCED_LEASE,
+		lnrpc.CommitmentType_UNKNOWN_COMMITMENT_TYPE:
 		return true
 	default:
 		return false
@@ -150,20 +151,24 @@ func CommitTypeHasAnchors(commitType lnrpc.CommitmentType) bool {
 func NodeArgsForCommitType(commitType lnrpc.CommitmentType) []string {
 	switch commitType {
 	case lnrpc.CommitmentType_LEGACY:
-		return []string{"--protocol.legacy.committweak"}
-	case lnrpc.CommitmentType_STATIC_REMOTE_KEY:
-		return []string{}
-	case lnrpc.CommitmentType_ANCHORS:
-		return []string{"--protocol.anchors"}
-	case lnrpc.CommitmentType_SCRIPT_ENFORCED_LEASE:
 		return []string{
-			"--protocol.anchors",
-			"--protocol.script-enforced-lease",
+			"--protocol.no-anchors",
+			"--protocol.legacy.committweak",
+			"--protocol.no-script-enforced-lease",
 		}
+	case lnrpc.CommitmentType_STATIC_REMOTE_KEY:
+		return []string{
+			"--protocol.no-anchors",
+			"--protocol.no-script-enforced-lease",
+		}
+	case lnrpc.CommitmentType_ANCHORS:
+		return []string{"--protocol.no-script-enforced-lease"}
+	case lnrpc.CommitmentType_SCRIPT_ENFORCED_LEASE:
+		return []string{}
 	case lnrpc.CommitmentType_SIMPLE_TAPROOT:
 		return []string{
-			"--protocol.anchors",
 			"--protocol.simple-taproot-chans",
+			"--protocol.no-script-enforced-lease",
 		}
 	}
 

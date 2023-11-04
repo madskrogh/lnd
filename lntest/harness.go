@@ -1189,7 +1189,7 @@ func (h *HarnessTest) CloseChannelAssertPending(hn *node.HarnessNode,
 	return stream, closeTxid
 }
 
-// CloseChannel attempts to coop close a non-anchored channel identified by the
+// CloseChannel attempts to coop close an anchored channel identified by the
 // passed channel point owned by the passed harness node. The following items
 // are asserted,
 //  1. a close pending event is sent from the close channel client.
@@ -1206,7 +1206,7 @@ func (h *HarnessTest) CloseChannel(hn *node.HarnessNode,
 	return h.AssertStreamChannelCoopClosed(hn, cp, false, stream)
 }
 
-// ForceCloseChannel attempts to force close a non-anchored channel identified
+// ForceCloseChannel attempts to force close an anchored channel identified
 // by the passed channel point owned by the passed harness node. The following
 // items are asserted,
 //  1. a close pending event is sent from the close channel client.
@@ -1504,17 +1504,11 @@ func (h *HarnessTest) CleanupForceClose(hn *node.HarnessNode) {
 	// Wait for the channel to be marked pending force close.
 	h.AssertNumPendingForceClose(hn, 1)
 
-	// Mine enough blocks for the node to sweep its funds from the force
-	// closed channel. The commit sweep resolver is able to broadcast the
-	// sweep tx up to one block before the CSV elapses, so wait until
-	// defaulCSV-1.
-	//
-	// NOTE: we might empty blocks here as we don't know the exact number
-	// of blocks to mine. This may end up mining more blocks than needed.
-	h.MineEmptyBlocks(node.DefaultCSV - 1)
-
-	// The node should now sweep the funds, clean up by mining the sweeping
-	// tx.
+	// Advance the chain until just before the CSV for the sweep tx elapses.
+	h.MineBlocks(node.DefaultCSV - 2)
+	// Sweep the anchor output.
+	h.MineBlocksAndAssertNumTxes(1, 1)
+	// Sweep the main output.
 	h.MineBlocksAndAssertNumTxes(1, 1)
 
 	// Mine blocks to get any second level HTLC resolved. If there are no

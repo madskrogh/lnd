@@ -888,7 +888,7 @@ func channelForceClosureTest(ht *lntest.HarnessTest,
 	ht.RestartNode(alice)
 
 	// Advance the chain until just before the 2nd-layer CSV delays expire.
-	// For anchor channels thhis is one block earlier.
+	// For anchor channels this is one block earlier.
 	numBlocks := uint32(defaultCSV - 1)
 	if lntest.CommitTypeHasAnchors(channelType) {
 		numBlocks = defaultCSV - 2
@@ -1118,7 +1118,7 @@ func testFailingChannel(ht *lntest.HarnessTest) {
 	ht.MineBlocks(defaultCSV - 1)
 
 	// Wait for the sweeping tx to be broadcast.
-	ht.Miner.AssertNumTxsInMempool(1)
+	ht.Miner.AssertNumTxsInMempool(3)
 
 	// Mine the sweep.
 	ht.MineBlocks(1)

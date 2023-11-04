@@ -719,21 +719,21 @@ func testRevokedCloseRetributionRemoteHodl(ht *lntest.HarnessTest) {
 // Carol's behalf sweeping her funds without a reward.
 func testRevokedCloseRetributionAltruistWatchtower(ht *lntest.HarnessTest) {
 	testCases := []struct {
-		name    string
-		anchors bool
+		name      string
+		noAnchors bool
 	}{{
-		name:    "anchors",
-		anchors: true,
+		name:      "anchors",
+		noAnchors: false,
 	}, {
-		name:    "legacy",
-		anchors: false,
+		name:      "legacy",
+		noAnchors: true,
 	}}
 
 	for _, tc := range testCases {
 		tc := tc
 		testFunc := func(ht *lntest.HarnessTest) {
 			testRevokedCloseRetributionAltruistWatchtowerCase(
-				ht, tc.anchors,
+				ht, tc.noAnchors,
 			)
 		}
 
@@ -759,7 +759,7 @@ func testRevokedCloseRetributionAltruistWatchtower(ht *lntest.HarnessTest) {
 }
 
 func testRevokedCloseRetributionAltruistWatchtowerCase(ht *lntest.HarnessTest,
-	anchors bool) {
+	noAnchors bool) {
 
 	const (
 		chanAmt     = funding.MaxBtcFundingAmount
@@ -771,8 +771,8 @@ func testRevokedCloseRetributionAltruistWatchtowerCase(ht *lntest.HarnessTest,
 	// Since we'd like to test some multi-hop failure scenarios, we'll
 	// introduce another node into our test network: Carol.
 	carolArgs := []string{"--hodl.exit-settle"}
-	if anchors {
-		carolArgs = append(carolArgs, "--protocol.anchors")
+	if noAnchors {
+		carolArgs = append(carolArgs, "--protocol.no-anchors")
 	}
 	carol := ht.NewNode("Carol", carolArgs)
 
@@ -808,8 +808,8 @@ func testRevokedCloseRetributionAltruistWatchtowerCase(ht *lntest.HarnessTest,
 		"--nolisten",
 		"--wtclient.active",
 	}
-	if anchors {
-		daveArgs = append(daveArgs, "--protocol.anchors")
+	if noAnchors {
+		daveArgs = append(daveArgs, "--protocol.no-anchors")
 	}
 	dave := ht.NewNode("Dave", daveArgs)
 
@@ -997,7 +997,7 @@ func testRevokedCloseRetributionAltruistWatchtowerCase(ht *lntest.HarnessTest,
 	ht.AssertNumPendingForceClose(dave, 0)
 
 	// If this is an anchor channel, Dave would sweep the anchor.
-	if anchors {
+	if !noAnchors {
 		ht.MineBlocksAndAssertNumTxes(1, 1)
 	}
 

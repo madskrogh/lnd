@@ -21,6 +21,7 @@ import (
 	"github.com/lightningnetwork/lnd/lnrpc/walletrpc"
 	"github.com/lightningnetwork/lnd/lntest"
 	"github.com/lightningnetwork/lnd/lntest/node"
+	"github.com/lightningnetwork/lnd/lnwallet"
 	"github.com/stretchr/testify/require"
 )
 
@@ -140,6 +141,8 @@ func runPsbtChanFunding(ht *lntest.HarnessTest, carol, dave *node.HarnessNode,
 
 	const chanSize = funding.MaxBtcFundingAmount
 	ht.FundCoins(btcutil.SatoshiPerBitcoin, dave)
+	// Ensure that carol has the required anchor reserves to open a channel
+	ht.FundCoins(lnwallet.AnchorChanReservedValue, carol)
 
 	// Before we start the test, we'll ensure both sides are connected so
 	// the funding flow can be properly executed.

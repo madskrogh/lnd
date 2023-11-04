@@ -28,7 +28,6 @@ func testZeroConfChannelOpen(ht *lntest.HarnessTest) {
 	scidAliasArgs := []string{
 		"--protocol.option-scid-alias",
 		"--protocol.zero-conf",
-		"--protocol.anchors",
 	}
 
 	bob := ht.Bob
@@ -236,7 +235,6 @@ func optionScidAliasScenario(ht *lntest.HarnessTest, chantype, private bool) {
 	// Option-scid-alias is opt-in, as is anchors.
 	scidAliasArgs := []string{
 		"--protocol.option-scid-alias",
-		"--protocol.anchors",
 	}
 
 	bob := ht.Bob
@@ -473,7 +471,6 @@ func testPrivateUpdateAlias(ht *lntest.HarnessTest,
 	scidAliasArgs := []string{
 		"--protocol.option-scid-alias",
 		"--protocol.zero-conf",
-		"--protocol.anchors",
 	}
 	carol := ht.NewNode("Carol", scidAliasArgs)
 
@@ -766,14 +763,11 @@ func testOptionScidUpgrade(ht *lntest.HarnessTest) {
 	bob := ht.Bob
 
 	// Start carol with anchors only.
-	carolArgs := []string{
-		"--protocol.anchors",
-	}
+	carolArgs := []string{}
 	carol := ht.NewNode("carol", carolArgs)
 
 	// Start dave with anchors + scid-alias.
 	daveArgs := []string{
-		"--protocol.anchors",
 		"--protocol.option-scid-alias",
 	}
 	dave := ht.NewNode("dave", daveArgs)
@@ -909,7 +903,6 @@ func testZeroConfReorg(ht *lntest.HarnessTest) {
 	zeroConfArgs := []string{
 		"--protocol.option-scid-alias",
 		"--protocol.zero-conf",
-		"--protocol.anchors",
 	}
 
 	carol := ht.NewNode("Carol", zeroConfArgs)
